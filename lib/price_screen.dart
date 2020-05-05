@@ -8,37 +8,59 @@ class PriceScreen extends StatefulWidget {
   _PriceScreenState createState() => _PriceScreenState();
 }
 
-/// get dropdown widgets for android material style
-List<DropdownMenuItem> getDropdownMenuItems() {
-  List<DropdownMenuItem<String>> dropdownItems = [];
-  // for (String currency in currenciesList) { // another way of doing it
-  for (int i = 0; i < currenciesList.length; i++) {
-    dropdownItems.add(
-      DropdownMenuItem(
-        child: Text(currenciesList[i]),
-        value: currenciesList[i],
-      ),
+class _PriceScreenState extends State<PriceScreen> {
+  String selectedCurrency;
+
+  /// dropdown for android
+  DropdownButton<String> getDropDownButton() {
+    // get our list of currencies
+    List<DropdownMenuItem<String>> dropdownItems = [];
+    for (int i = 0; i < currenciesList.length; i++) {
+      dropdownItems.add(
+        DropdownMenuItem(
+          child: Text(currenciesList[i]),
+          value: currenciesList[i],
+        ),
+      );
+    }
+
+    // return the main dropdown widget
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: dropdownItems,
+      onChanged: (value) {
+        setState(() {
+          print(value);
+          selectedCurrency = value;
+        });
+      },
     );
   }
 
-  return dropdownItems;
-}
+// picker for iOS
+  CupertinoPicker getCupertinoPicker() {
+    /// create our list of currency widgets
+    List<Widget> pickerWidgets = [];
+    for (String currency in currenciesList) {
+      pickerWidgets.add(
+        Text(
+          currency,
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
 
-/// get widgets for cupertino style picker
-List<Widget> getPickerItems() {
-  List<Widget> pickerWidgets = [];
-  for (String currency in currenciesList) {
-    pickerWidgets.add(Text(
-      currency,
-      style: TextStyle(color: Colors.white),
-    ));
+    // now return the cupertino picker
+    return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedIndex) {
+        print(selectedIndex);
+      },
+      children: pickerWidgets,
+    );
   }
 
-  return pickerWidgets;
-}
-
-class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,28 +97,10 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: CupertinoPicker(
-              backgroundColor: Colors.lightBlue,
-              itemExtent: 32.0,
-              onSelectedItemChanged: (selectedIndex) {
-                print(selectedIndex);
-              },
-              children: getPickerItems(),
-            ),
+            child: getCupertinoPicker(),
           ),
         ],
       ),
     );
   }
 }
-
-//  DropdownButton<String>(
-//               value: selectedCurrency,
-//               items: getDropdownMenuItems(),
-//               onChanged: (value) {
-//                 setState(() {
-//                   print(value);
-//                   selectedCurrency = value;
-//                 });
-//               },
-//             ),
