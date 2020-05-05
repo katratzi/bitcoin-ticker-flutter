@@ -1,15 +1,15 @@
 import 'package:bitcoin_ticker/coin_data.dart';
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
+import 'package:flutter/cupertino.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
+/// get dropdown widgets for android material style
 List<DropdownMenuItem> getDropdownMenuItems() {
-  /// get dropdown widgets for all our currencies
-
   List<DropdownMenuItem<String>> dropdownItems = [];
   // for (String currency in currenciesList) { // another way of doing it
   for (int i = 0; i < currenciesList.length; i++) {
@@ -22,6 +22,19 @@ List<DropdownMenuItem> getDropdownMenuItems() {
   }
 
   return dropdownItems;
+}
+
+/// get widgets for cupertino style picker
+List<Widget> getPickerItems() {
+  List<Widget> pickerWidgets = [];
+  for (String currency in currenciesList) {
+    pickerWidgets.add(Text(
+      currency,
+      style: TextStyle(color: Colors.white),
+    ));
+  }
+
+  return pickerWidgets;
 }
 
 class _PriceScreenState extends State<PriceScreen> {
@@ -62,15 +75,13 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton<String>(
-              value: selectedCurrency,
-              items: getDropdownMenuItems(),
-              onChanged: (value) {
-                setState(() {
-                  print(value);
-                  selectedCurrency = value;
-                });
+            child: CupertinoPicker(
+              backgroundColor: Colors.lightBlue,
+              itemExtent: 32.0,
+              onSelectedItemChanged: (selectedIndex) {
+                print(selectedIndex);
               },
+              children: getPickerItems(),
             ),
           ),
         ],
@@ -78,3 +89,14 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
+
+//  DropdownButton<String>(
+//               value: selectedCurrency,
+//               items: getDropdownMenuItems(),
+//               onChanged: (value) {
+//                 setState(() {
+//                   print(value);
+//                   selectedCurrency = value;
+//                 });
+//               },
+//             ),
