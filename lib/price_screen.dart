@@ -12,7 +12,6 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency;
-
   String bitcoinRate = '?';
 
   /// dropdown for android
@@ -35,7 +34,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           print(value);
-          selectedCurrency = value;
+          setCurrency(value);
         });
       },
     );
@@ -59,10 +58,18 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        // print(selectedIndex);
+        setCurrency(currenciesList[selectedIndex]);
       },
       children: pickerWidgets,
     );
+  }
+
+  void setCurrency(String desiredCurrency) {
+    if (selectedCurrency != desiredCurrency) {
+      selectedCurrency = desiredCurrency;
+      getExchangeRate();
+    }
   }
 
   void updateUi(dynamic coinData) {
@@ -80,7 +87,7 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getExchangeRate() async {
-    CoinData coinData = CoinData(crypto: 'BTC', currency: 'USD');
+    CoinData coinData = CoinData(crypto: 'BTC', currency: selectedCurrency);
     var exchangeData = await coinData.getExchangeRate();
     updateUi(exchangeData);
   }
@@ -114,7 +121,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $bitcoinRate USD',
+                  '1 BTC = $bitcoinRate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -129,7 +136,9 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: Platform.isIOS ? iosPicker() : androidDropdown(),
+            // child: Platform.isIOS ? iosPicker() : androidDropdown(),
+            // child: iosPicker(),
+            child: androidDropdown(),
           ),
         ],
       ),
