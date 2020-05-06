@@ -131,39 +131,55 @@ class _PriceScreenState extends State<PriceScreen> {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          exchangeRateCard(
-              cryptoCurrency: cryptoList[0],
-              realCurrency: selectedCurrency,
-              exchangeRate: bitcoinRate),
-          exchangeRateCard(
-              cryptoCurrency: cryptoList[1],
-              realCurrency: selectedCurrency,
-              exchangeRate: ethereumRate),
-          exchangeRateCard(
-              cryptoCurrency: cryptoList[2],
-              realCurrency: selectedCurrency,
-              exchangeRate: litecoinRate),
-          SizedBox(height: 200.0),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              CryptoCard(
+                  cryptoCurrency: cryptoList[0],
+                  realCurrency: selectedCurrency,
+                  exchangeRate: bitcoinRate),
+              CryptoCard(
+                  cryptoCurrency: cryptoList[1],
+                  realCurrency: selectedCurrency,
+                  exchangeRate: ethereumRate),
+              CryptoCard(
+                  cryptoCurrency: cryptoList[2],
+                  realCurrency: selectedCurrency,
+                  exchangeRate: litecoinRate),
+              // SizedBox(height: 200.0),
+            ],
+          ),
           Container(
             height: 150.0,
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            // child: Platform.isIOS ? iosPicker() : androidDropdown(),
+            // platform specific picked
+            child: Platform.isIOS ? iosPicker() : androidDropdown(),
             // child: iosPicker(),
-            child: androidDropdown(),
+            // child: androidDropdown(),
           ),
         ],
       ),
     );
   }
+}
 
-  Padding exchangeRateCard(
-      {@required String cryptoCurrency,
-      @required String realCurrency,
-      @required String exchangeRate}) {
+class CryptoCard extends StatelessWidget {
+  const CryptoCard({
+    @required this.cryptoCurrency,
+    @required this.realCurrency,
+    @required this.exchangeRate,
+  });
+
+  final String cryptoCurrency;
+  final String realCurrency;
+  final String exchangeRate;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
       child: Card(
