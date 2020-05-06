@@ -1,5 +1,4 @@
 import 'package:bitcoin_ticker/coin_data.dart';
-import 'package:bitcoin_ticker/networking.dart';
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +12,8 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency;
   String bitcoinRate = '?';
+  String ethereumRate = '?';
+  String litecoinRate = '?';
 
   /// dropdown for android
   DropdownButton<String> androidDropdown() {
@@ -72,24 +73,46 @@ class _PriceScreenState extends State<PriceScreen> {
     }
   }
 
-  void updateUi(dynamic coinData) {
+  void updateUi(dynamic coinData, String currentCrypto) {
     setState(() {
       // check for null
       if (coinData == null) {
-        bitcoinRate = '?';
+        if (currentCrypto == 'BTC') {
+          bitcoinRate = '?';
+        } else if (currentCrypto == 'ETH') {
+          ethereumRate = '?';
+        } else if (currentCrypto == 'LTC') {
+          litecoinRate = '?';
+        }
         return;
       }
       // we have good data, parse it
-      double bitcoinAccurate = coinData['rate'];
-      bitcoinRate = bitcoinAccurate.toInt().toString();
-      print('btc is $bitcoinRate}');
+      double rateAccurate = coinData['rate'];
+      if (currentCrypto == 'BTC') {
+        bitcoinRate = rateAccurate.toInt().toString();
+        print('btc is $bitcoinRate');
+      } else if (currentCrypto == 'ETH') {
+        ethereumRate = rateAccurate.toInt().toString();
+        print('etc is $ethereumRate');
+      } else if (currentCrypto == 'LTC') {
+        litecoinRate = rateAccurate.toInt().toString();
+        print('ltc is $litecoinRate');
+      }
     });
   }
 
   void getExchangeRate() async {
-    CoinData coinData = CoinData(crypto: 'BTC', currency: selectedCurrency);
-    var exchangeData = await coinData.getExchangeRate();
-    updateUi(exchangeData);
+    // reset our rates
+    bitcoinRate = '?';
+    ethereumRate = '?';
+    litecoinRate = '?';
+    // loop through all three currencies
+    for (String cryptoCurrency in cryptoList) {
+      CoinData coinData =
+          CoinData(crypto: cryptoCurrency, currency: selectedCurrency);
+      var exchangeData = await coinData.getExchangeRate();
+      updateUi(exchangeData, cryptoCurrency);
+    }
   }
 
   @override
@@ -110,27 +133,19 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $bitcoinRate $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          exchangeRateCard(
+              cryptoCurrency: cryptoList[0],
+              realCurrency: selectedCurrency,
+              exchangeRate: bitcoinRate),
+          exchangeRateCard(
+              cryptoCurrency: cryptoList[1],
+              realCurrency: selectedCurrency,
+              exchangeRate: ethereumRate),
+          exchangeRateCard(
+              cryptoCurrency: cryptoList[2],
+              realCurrency: selectedCurrency,
+              exchangeRate: litecoinRate),
+          SizedBox(height: 200.0),
           Container(
             height: 150.0,
             alignment: Alignment.center,
@@ -141,6 +156,33 @@ class _PriceScreenState extends State<PriceScreen> {
             child: androidDropdown(),
           ),
         ],
+      ),
+    );
+  }
+
+  Padding exchangeRateCard(
+      {@required String cryptoCurrency,
+      @required String realCurrency,
+      @required String exchangeRate}) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $cryptoCurrency = $exchangeRate $realCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
